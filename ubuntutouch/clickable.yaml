@@ -1,0 +1,26 @@
+clickable_minimum_required: 8.0.0
+
+builder: custom
+
+build:
+  chmod +x ${ROOT}/googledrive/dep.sh
+  ${ROOT}/ubuntutouch/manifest.json.in.sh > ${BUILD_DIR}/install/manifest.json
+  qmake ${ROOT}/aivctrl.pro
+  make -j
+
+root_dir: ../
+
+install_root_data:
+  aivctrl.apparmor
+  aivctrl.desktop
+  ${BUILD_DIR}/aivctrl/aivctrl
+
+install_data:
+  ${BUILD_DIR}/aivctrl/plugins/googledrive.ids: plugins
+  ${BUILD_DIR}/aivctrl/plugins/googledrive.png: plugins
+  ${BUILD_DIR}/aivctrl/plugins/googledrive.so: plugins
+  ${ROOT}/aivctrl/icons/aivctrl64.png : icons
+
+
+build_dir: build/${ARCH_TRIPLET}
+kill: aivctrl

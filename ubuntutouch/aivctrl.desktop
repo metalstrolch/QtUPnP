@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=AIVCtrl
+Exec=aivctrl
+Icon=icons/aivctrl64.png
+Terminal=false
+Type=Application
+X-Lomiri-Touch=true

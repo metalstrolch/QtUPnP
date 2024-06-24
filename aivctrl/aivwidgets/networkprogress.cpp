@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QDateTime>
 #include <QDebug>
+#include <QPainterPath>
 
 CNetworkProgress::CNetworkProgress (char const * name, QWidget* parent) : QWidget (parent)
 {
