@@ -1,5 +1,6 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
+#include "fakerenderer.hpp"
 #include "aivwidgets/networkprogress.hpp"
 #include "aivwidgets/widgethelper.hpp"
 #include "../upnp/renderingcontrol.hpp"
@@ -91,7 +92,10 @@ void CMainWindow::updatePosition ()
     int const maxAbsCount = 2000000000; // Probably to big :).
 
     // Get position from GetPositionInfo action.
-    ui->m_position->updatePosition (m_cp, m_renderer);
+    if(isFakeRenderer(m_renderer))
+      ui->m_position->updatePosition (ui->m_cover->getPlayer(), ui->m_queue);
+    else
+      ui->m_position->updatePosition (m_cp, m_renderer);
     CPositionInfo const & positionInfo = ui->m_position->positionInfo ();
 
     QString const & trackURI = positionInfo.trackURI ();

@@ -33,9 +33,15 @@ CMainWindow::CMainWindow (QWidget *parent) : QMainWindow (parent), ui (new Ui::C
 
   connect (ui->m_queue, &CPlaylistBrowser::rowsMoved, this, &CMainWindow::rowsMoved);
   connect (ui->m_queue, &CPlaylistBrowser::removeIDs, this, &CMainWindow::removeIDs);
+  connect (ui->m_queue, &CPlaylistBrowser::externalPlay, this, [this](QString uri) {
+    ui->m_cover->playUri(uri);
+  });
 
   connect (ui->m_playlistContent, &CPlaylistBrowser::rowsMoved, this, &CMainWindow::rowsMoved);
   connect (ui->m_playlistContent, &CPlaylistBrowser::removeIDs, this, &CMainWindow::removeIDs);
+  connect (ui->m_playlistContent, &CPlaylistBrowser::externalPlay, this, [this](QString uri) {
+    ui->m_cover->playUri(uri);
+  });
 
   QKeySequence ks = QKeySequence(Qt::CTRL + Qt::Key_F11);
   connect (new QShortcut (ks, this), &QShortcut::activated, this, &CMainWindow::showDump);

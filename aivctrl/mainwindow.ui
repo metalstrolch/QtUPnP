@@ -714,7 +714,7 @@
          </layout>
         </item>
         <item row="1" column="0">
-         <widget class="CCover" name="m_cover">
+         <widget class="CCover" name="m_cover" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
             <horstretch>0</horstretch>
@@ -724,14 +724,11 @@
           <property name="toolTip">
            <string>Current cover</string>
           </property>
-          <property name="text">
+          <property name="text" stdset="0">
            <string/>
           </property>
-          <property name="pixmap">
+          <property name="pixmap" stdset="0">
            <pixmap resource="aivctrl.qrc">:/icons/audio_file_big.png</pixmap>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -1043,9 +1040,9 @@
    <header>aivwidgets/textmetadata.hpp</header>
   </customwidget>
   <customwidget>
-   <class>CCover</class>
-   <extends>QLabel</extends>
-   <header>aivwidgets/cover.hpp</header>
+   <class>QVideoWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QVideoWidget</header>
   </customwidget>
   <customwidget>
    <class>CPosition</class>
@@ -1066,6 +1063,11 @@
    <class>CCloudBrowser</class>
    <extends>QListWidget</extends>
    <header location="global">aivwidgets/cloudbrowser.hpp</header>
+  </customwidget>
+  <customwidget>
+   <class>CCover</class>
+   <extends>QVideoWidget</extends>
+   <header>aivwidgets/cover.hpp</header>
   </customwidget>
  </customwidgets>
  <resources>

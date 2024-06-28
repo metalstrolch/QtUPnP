@@ -4,6 +4,8 @@
 #include "../upnp/dump.hpp"
 #include <QShortcut>
 #include <QMessageBox>
+#include <QStringLiteral>
+#include "fakerenderer.hpp"
 
 USING_UPNP_NAMESPACE
 
@@ -17,13 +19,46 @@ CPlaylistBrowser::CPlaylistBrowser (QWidget* parent) : CContentDirectoryBrowser 
 
 void CPlaylistBrowser::setAVTransportURI (CControlPoint* cp, QString const & renderer, int itemRow)
 {
+  //fprintf(stderr, "setAVTransportURI: %s\n", renderer.toStdString().c_str());
   CAVTransport avt (cp);
-  avt.stop (renderer); // Some renderers return wrong values if the function is not called in mode "PLAYING".
-  CDevice const & device = cp->device (renderer);
-
   CContentDirectoryBrowserItem* cdItem   = static_cast<CContentDirectoryBrowserItem*>(item (itemRow));
   CDidlItem                     didlItem = cdItem->didlItem ();
   CDidlItem::EType              type     = didlItem.type ();
+  //fprintf(stderr, "setAVTransportURI == %s\n", didlItem.uri(0).toStdString().c_str());
+  if(isFakeRenderer(renderer))
+  {
+    if (!m_disableUPnPPlaylist && type != CDidlItem::AudioBroadcast && type != CDidlItem::VideoBroadcast )
+    {
+      //fprintf(stderr, "is a playlist?\n");
+      int      seekTo       = 0;
+      QList<CDidlItem::TPlaylistElem> playlistElems;
+      int                             cItems = count ();
+      playlistElems.reserve (cItems);
+      for (int iItem = 0; iItem < cItems; ++iItem)
+      {
+        CContentDirectoryBrowserItem* itemIItem  = static_cast<CContentDirectoryBrowserItem*>(item (iItem));
+        CDidlItem                     didlItem   = itemIItem->didlItem ();
+        replaceNoHttpScheme (didlItem);
+        playlistElems.push_back (CDidlItem::TPlaylistElem (didlItem, 0));
+        if (iItem == itemRow)
+        {
+          seekTo = iItem + 1;
+          //fprintf(stderr, "setAVTransportURI(%d)  == %s\n", itemRow, didlItem.uri(0).toStdString().c_str());
+	  emit externalPlay(didlItem.uri(0));
+        }
+      }
+    }
+    else
+    {
+      //fprintf(stderr, "setAVTransportURI == %s\n", didlItem.uri(0).toStdString().c_str());
+      emit externalPlay(didlItem.uri(0));
+    }
+    return;
+  }
+
+  avt.stop (renderer); // Some renderers return wrong values if the function is not called in mode "PLAYING".
+  CDevice const & device = cp->device (renderer);
+
   if (!m_disableUPnPPlaylist && type != CDidlItem::AudioBroadcast && type != CDidlItem::VideoBroadcast && device.playlistStatus () == CDevice::PlaylistHandler)
   {
     QString  playlistName = CHTTPServer::formatUUID (renderer);

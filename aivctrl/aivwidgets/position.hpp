@@ -3,6 +3,8 @@
 
 #include "../upnp/positioninfo.hpp"
 #include "slider.hpp"
+#include "playlistbrowser.hpp"
+#include <QMediaPlayer>
 
 namespace QtUPnP
 {
@@ -23,6 +25,7 @@ public:
 
   /*! Updates the position for a renderer. This function invokes GetPosition action. */
   void updatePosition (QtUPnP::CControlPoint* cp, QString const & renderer);
+  void updatePosition (QMediaPlayer* player, CPlaylistBrowser* list);
 
   /*! Returns the current QtUPnP::CPositionInfo. */
   QtUPnP::CPositionInfo const & positionInfo () const { return m_positionInfo; }

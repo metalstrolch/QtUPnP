@@ -2,11 +2,35 @@
 #include "widgethelper.hpp"
 #include "../upnp/datacaller.hpp"
 #include <QPainter>
+#include <QUrl>
+#include <QResizeEvent>
+
+#include <stdio.h>
 
 USING_UPNP_NAMESPACE
 
-CCover::CCover (QWidget* parent) : QLabel (parent)
+CCover::CCover (QWidget* parent) : QVideoWidget (parent), m_label{this}
 {
+  m_player.setVideoOutput(this);
+
+  connect(&m_player, &QMediaPlayer::stateChanged, this, [this](QMediaPlayer::State state) {
+    if(state == QMediaPlayer::PlayingState) {
+       m_label.hide();
+       m_label.lower();
+    } else {
+       m_label.show();
+       m_label.raise();
+    }
+  });
+  m_label.hide();
+}
+
+void CCover::resizeEvent(QResizeEvent *event)
+{
+  m_label.setAlignment (Qt::AlignCenter);
+  m_label.resize(event->size());
+  m_label.setPixmap(m_pixmap.scaled(event->size(),Qt::KeepAspectRatio));
+  QVideoWidget::resizeEvent(event);
 }
 
 void CCover::setImage (QString const & uri)
@@ -29,40 +53,26 @@ void CCover::setImage (QString const & uri)
   {
     m_pixmap = QPixmap (::resIconFullPath (m_defaultPixmap));
   }
+  m_label.setAlignment (Qt::AlignCenter);
+  m_label.setPixmap(m_pixmap.scaled(m_label.size(),Qt::KeepAspectRatio));
 
-  update ();
+  m_label.update ();
 }
 
-void CCover::paintEvent (QPaintEvent* event)
+void CCover::playUri (const QString & uri)
 {
-  if (!m_pixmap.isNull ())
-  {
-    float wl = width (),          hl = height ();
-    float wp = m_pixmap.width (), hp = m_pixmap.height ();
-    float ws = wl / wp;
-    float hs = hl / hp;
-    QPixmap pxm;
-    if (ws < hs)
-    {
-      pxm = m_pixmap.scaledToWidth (wl, Qt::SmoothTransformation);
-    }
-    else
-    {
-      pxm = m_pixmap.scaledToHeight (hl, Qt::SmoothTransformation);
-    }
+  fprintf(stderr, "playUri == %s\n", uri.toStdString().c_str());
+  m_player.stop();
+  m_player.setMedia(nullptr);
+  m_label.hide();
+  m_player.setMedia(QUrl(uri));
+  setMinimumWidth(10);
+  setMinimumHeight(10);
+  m_player.play();
+  show();
+}
 
-    QPainter paint (this);
-    int      x = (wl - pxm.width ())  / 2;
-    int      y = (hl - pxm.height ()) / 2;
-    if (!isEnabled ())
-    {
-      paint.setOpacity (0.2);
-    }
-
-    paint.drawPixmap (x, y, pxm);
-  }
-  else
-  {
-    QLabel::paintEvent (event);
-  }
+void CCover::setDefaultPixmapName (QString const & pixmap)
+{
+    m_defaultPixmap = pixmap;
 }

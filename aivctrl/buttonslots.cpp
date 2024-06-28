@@ -3,6 +3,7 @@
 #include "aivwidgets/widgethelper.hpp"
 #include "../upnp/avtransport.hpp"
 #include "../upnp/renderingcontrol.hpp"
+#include "fakerenderer.hpp"
 
 USING_UPNP_NAMESPACE
 
@@ -46,6 +47,28 @@ void CMainWindow::on_m_play_clicked ()
   searchAction (false);
   ui->m_play->setEnabled (false);
   ui->m_play2->setEnabled (false);
+  if(isFakeRenderer(m_renderer))
+  {
+     //Check player state
+     auto* player = ui->m_cover->getPlayer();
+
+     //Are we playing?
+     if(player->state() == QMediaPlayer::PlayingState)
+     {
+       fprintf(stderr, "Seems we're playing\n");
+       player->pause();
+       updatePP(false);
+     } else if(player->state() == QMediaPlayer::PausedState) {
+       fprintf(stderr, "Seems we're paused\n");
+       player->play();
+       updatePP(true);
+     } else if(player->state() == QMediaPlayer::StoppedState) {
+       fprintf(stderr, "Seems we're stopped.\n");
+//       player->play():
+       updatePP(false);
+     }
+     return;
+  }
 
   CAVTransport   avt (m_cp);
   CTransportInfo  info           = avt.getTransportInfo (m_renderer);
@@ -92,13 +115,21 @@ void CMainWindow::on_m_play2_clicked ()
 
 void CMainWindow::on_m_mute_clicked ()
 {
+  bool mute=false;
   searchAction (false);
   ui->m_mute->setEnabled (false);
   ui->m_mute2->setEnabled (false);
 
-  CRenderingControl rc (m_cp);
-  bool              mute = !rc.getMute (m_renderer);
-  rc.setMute (m_renderer, mute);
+  if(isFakeRenderer(m_renderer)) {
+    mute=!ui->m_cover->getPlayer()->isMuted();
+    ui->m_cover->getPlayer()->setMuted(mute);
+  }
+  else
+  {
+    CRenderingControl rc (m_cp);
+    mute = !rc.getMute (m_renderer);
+    rc.setMute (m_renderer, mute);
+  }
   muteIcon (mute);
 
   ui->m_mute->setEnabled (true);

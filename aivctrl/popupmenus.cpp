@@ -6,6 +6,7 @@
 #include "settings.hpp"
 #include "helper.hpp"
 #include "ui_mainwindow.h"
+#include "fakerenderer.hpp"
 #include "aivwidgets/widgethelper.hpp"
 #include "aivwidgets/networkprogress.hpp"
 #include "../upnp/connectionmanager.hpp"
@@ -82,6 +83,34 @@ void CMainWindow::aboutToShowRenderer ()
     action->setData (uuid);
     menu->addAction (action);
   }
+  //add fake renderer for local playback
+  if(1)
+  {
+    QPixmap            pxm;
+    pxm.load (::resIconFullPath ("device"));
+    QAction* fakeAction = new QAction("Local playback", menu);
+    fakeAction->setIcon(QIcon(pxm));
+    fakeAction->setData(QStringLiteral(LOCAL_PLAYBACK_GUID));
+    menu->addAction(fakeAction);
+  }
+}
+
+void CMainWindow::localRendererAction(QAction* action)
+{
+  QString renderer = action->data ().toString ();
+  if (!m_renderer.isEmpty ())
+  {
+    m_cp->unsubscribe (m_renderer);
+  }
+  m_renderer = renderer;
+  auto name = QStringLiteral("Local Playback");
+  ui->m_rendererName->setText (name);
+  ui->m_rendererName->setToolTip (name);
+  ui->m_renderer->setIcon (action->icon ());
+  ui->m_volume->setMaximum (100);
+  ui->m_volume2->setMaximum (100);
+  updateVolumeSlider (ui->m_cover->getPlayer()->volume(), true);
+  muteIcon (ui->m_cover->getPlayer()->isMuted());
 }
 
 void CMainWindow::rendererAction (QAction* action)
@@ -89,6 +118,10 @@ void CMainWindow::rendererAction (QAction* action)
   QString renderer = action->data ().toString ();
   if (m_renderer != renderer)
   {
+    if(isFakeRenderer(renderer))
+    {
+        return localRendererAction(action);
+    }
     // Juste to update variables. Normally eventing must update correctly variable.
     // If protocols is empty the renderer not able to receive or send data. May be it is off or crashed.
     QVector<QStringList> protocols = CConnectionManager (m_cp).getProtocolInfos (renderer);
@@ -301,6 +334,7 @@ void CMainWindow::contextualAction (QAction* action)
           {
             case ReplaceQueue :
               ui->m_queue->clear ();
+	      //fallthrough
             case AddQueue :
             {
               QApplication::setOverrideCursor (Qt::WaitCursor);

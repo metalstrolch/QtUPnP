@@ -2,10 +2,30 @@
 #include "../upnp/avtransport.hpp"
 #include "../upnp/helper.hpp"
 
+
 USING_UPNP_NAMESPACE
 
 CPosition::CPosition (QWidget* parent) : CSlider (parent)
 {
+}
+
+void CPosition::updatePosition (QMediaPlayer* player, CPlaylistBrowser* list)
+{
+  auto absTimeMs = player->duration() /1000;
+  auto relTimeMs = player->position() /1000;
+  CContentDirectoryBrowserItem *item = (CContentDirectoryBrowserItem*)list->item(list->boldIndex());
+  m_positionInfo.setTrackURI(item->didlItem().uri(0));
+  m_positionInfo.setAbsCount(list->count());
+  m_positionInfo.setRelCount(list->boldIndex() + 1);
+
+  setEnabled(true);
+  blockSignals(true);
+  setMaximum(absTimeMs);
+#ifdef Q_OS_MACOS
+  setTickInterval (absTimeMS / 10);
+#endif
+  setValue(relTimeMs);
+  blockSignals(false);
 }
 
 void CPosition::updatePosition (CControlPoint* cp, QString const & renderer)

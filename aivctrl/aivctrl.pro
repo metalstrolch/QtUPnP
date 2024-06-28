@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network xml
+QT       += core gui network xml multimedia multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -57,6 +57,7 @@ HEADERS  += mainwindow.hpp \
     about.hpp \
     language.hpp \
     settings.hpp \
+    fakeprenderer.hpp \
     aivwidgets/contentdirectorybrowser.hpp \
     aivwidgets/cover.hpp \
     aivwidgets/devicebrowser.hpp \

@@ -200,6 +200,9 @@ protected slots :
   void aboutToShowRenderer ();
 
   /*! An action of the renderers menu has been triggered. */
+  void localRendererAction (QAction* action);
+
+  /*! An action of the renderers menu has been triggered. */
   void rendererAction (QAction* action);
 
   /*! The contextual menu will be displayed. */

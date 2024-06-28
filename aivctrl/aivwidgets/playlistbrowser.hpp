@@ -52,6 +52,8 @@ signals :
   /*! Items are about to moved. */
   void rowsAboutToBeMoved (QModelIndex const & parent, int start, int end, QModelIndex const & destination, int row);
 
+  void externalPlay(QString uir);
+
 private :
   void replaceNoHttpScheme (QtUPnP::CDidlItem& didlItem);
 
