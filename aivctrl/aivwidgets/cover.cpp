@@ -9,29 +9,44 @@
 
 USING_UPNP_NAMESPACE
 
-CCover::CCover (QWidget* parent) : QVideoWidget (parent), m_label{this}
+CCover::CCover (QWidget* parent) : QStackedWidget (parent)
 {
-  m_player.setVideoOutput(this);
+  m_video = new QVideoWidget();
+  m_player = new QMediaPlayer();
+  m_label = new QLabel();
 
-  connect(&m_player, &QMediaPlayer::stateChanged, this, [this](QMediaPlayer::State state) {
+  addWidget(m_label);
+  addWidget(m_video);
+
+  m_video->setMinimumWidth(10);
+  m_video->setMinimumHeight(10);
+  m_player->setVideoOutput(m_video);
+
+  connect(m_player, &QMediaPlayer::stateChanged, this, [this](QMediaPlayer::State state) {
     if(state == QMediaPlayer::PlayingState) {
-       m_label.hide();
-       m_label.lower();
+      setCurrentIndex(1);
     } else {
-       m_label.show();
-       m_label.raise();
+      setCurrentIndex(0);
     }
   });
-  m_label.hide();
+  setCurrentIndex(0);
 }
 
-void CCover::resizeEvent(QResizeEvent *event)
+CCover::~CCover()
 {
-  m_label.setAlignment (Qt::AlignCenter);
-  m_label.resize(event->size());
-  m_label.setPixmap(m_pixmap.scaled(event->size(),Qt::KeepAspectRatio));
-  QVideoWidget::resizeEvent(event);
+  m_player->stop();
+  m_player->setMedia(nullptr);
+  delete(m_player);
+  m_player=nullptr;
 }
+
+//void CCover::resizeEvent(QResizeEvent *event)
+//{
+//  m_label.setAlignment (Qt::AlignCenter);
+//  m_label.resize(event->size());
+//  m_label.setPixmap(m_pixmap.scaled(event->size(),Qt::KeepAspectRatio));
+//  QVideoWidget::resizeEvent(event);
+//}
 
 void CCover::setImage (QString const & uri)
 {
@@ -53,23 +68,20 @@ void CCover::setImage (QString const & uri)
   {
     m_pixmap = QPixmap (::resIconFullPath (m_defaultPixmap));
   }
-  m_label.setAlignment (Qt::AlignCenter);
-  m_label.setPixmap(m_pixmap.scaled(m_label.size(),Qt::KeepAspectRatio));
+  m_label->setAlignment (Qt::AlignCenter);
+  m_label->setPixmap(m_pixmap.scaled(m_label->size(),Qt::KeepAspectRatio));
 
-  m_label.update ();
+  m_label->update ();
 }
 
 void CCover::playUri (const QString & uri)
 {
   fprintf(stderr, "playUri == %s\n", uri.toStdString().c_str());
-  m_player.stop();
-  m_player.setMedia(nullptr);
-  m_label.hide();
-  m_player.setMedia(QUrl(uri));
-  setMinimumWidth(10);
-  setMinimumHeight(10);
-  m_player.play();
-  show();
+  m_player->setMedia(QUrl(uri));
+  m_video->setMinimumWidth(10);
+  m_video->setMinimumHeight(10);
+  m_video->show();
+  m_player->play();
 }
 
 void CCover::setDefaultPixmapName (QString const & pixmap)

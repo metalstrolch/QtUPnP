@@ -1040,11 +1040,6 @@
    <header>aivwidgets/textmetadata.hpp</header>
   </customwidget>
   <customwidget>
-   <class>QVideoWidget</class>
-   <extends>QWidget</extends>
-   <header location="global">QVideoWidget</header>
-  </customwidget>
-  <customwidget>
    <class>CPosition</class>
    <extends>QSlider</extends>
    <header>aivwidgets/position.hpp</header>
@@ -1066,7 +1061,7 @@
   </customwidget>
   <customwidget>
    <class>CCover</class>
-   <extends>QVideoWidget</extends>
+   <extends>QStackedWidget</extends>
    <header>aivwidgets/cover.hpp</header>
   </customwidget>
  </customwidgets>

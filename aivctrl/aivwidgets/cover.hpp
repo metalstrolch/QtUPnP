@@ -1,6 +1,7 @@
 #ifndef COVER_HPP
 #define COVER_HPP
 
+#include <QStackedWidget>
 #include <QVideoWidget>
 #include <QMediaPlayer>
 #include <QLabel>
@@ -9,11 +10,14 @@
  * The main functionalities are to show the cover and scale the image at the size of the container.
  * In this case a Qlabel. The cover can be provided by the server or the cache.
  */
-class CCover : public QVideoWidget
+class CCover : public QStackedWidget
 {
 public:
   /*! Default constructor. */
   CCover (QWidget* parent = nullptr);
+
+  /*! Destructor */
+  ~CCover();
 
   /*! Sets an image from an uri. */
   void setImage (QString const & uri);
@@ -28,19 +32,20 @@ public:
   QString const & defaultPixmapName () const { return m_defaultPixmap; }
 
   /*! Returns Player*/
-  QMediaPlayer * getPlayer(void) { return &m_player; }
+  QMediaPlayer * getPlayer(void) { return m_player; }
 
   /*! Try to play URI */
   void playUri (const QString & uri);
 
+//protected :
+//  void resizeEvent(QResizeEvent *event) override;
 protected :
-  void resizeEvent(QResizeEvent *event) override;
-protected :
-  QMediaPlayer m_player;
+  QVideoWidget *m_video = nullptr;
+  QMediaPlayer *m_player = nullptr;
   int m_imageTimeout = 10000; //!< Timeout to obtain the image from the server.
   QPixmap m_pixmap; //!< The actual pixmap.
   QString m_defaultPixmap; //!< The default image
-  QLabel m_label;
+  QLabel *m_label = nullptr;
 };
 
 
