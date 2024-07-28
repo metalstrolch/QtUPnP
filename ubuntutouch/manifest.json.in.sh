@@ -11,7 +11,7 @@ cat << EOF
             "desktop":  "aivctrl.desktop"
         }
     },
-    "version": "1.1.4",
+    "version": "1.1.4-2",
     "maintainer": "Stefan Wildemann <spamfaenger@metalstrolche.de>",
     "framework" : "${SDK_FRAMEWORK}"
 }

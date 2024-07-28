@@ -24,3 +24,6 @@ install_data:
 
 build_dir: build/${ARCH_TRIPLET}
 kill: aivctrl
+
+dependencies_target:
+- gstreamer1.0-plugins-good

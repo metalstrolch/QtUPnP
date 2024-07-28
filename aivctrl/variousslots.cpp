@@ -147,6 +147,27 @@ void CMainWindow::updatePosition ()
       // Set bold the current playing item.
       setItemBold (trackURI);
 
+      if(isFakeRenderer(m_renderer))
+      {
+        static int stopCount = 0;
+	//Check if still playing, otherwise get next media
+	if(m_relTimeCurrent == relTimeS) {
+	  //Media stalled. Check why.
+	  auto state = ui->m_cover->getPlayer()->state();
+	  if(state == QMediaPlayer::StoppedState)
+	  {
+	    //PLayer stopped. Next after timeout.
+	    if(stopCount++ > 10) {
+	      nextItem(true);
+	    }
+	  }
+	} else {
+	  stopCount =0;
+	}
+
+        return;
+      }
+
       // The part of code is needed for renderers that:
       //   - Don't handle playlist or playlist disable.
       //   - Have no SetNextAVTransportURI.

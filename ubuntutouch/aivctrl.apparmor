@@ -2,6 +2,8 @@
     "policy_groups": [
 	"networking",
 	"connectivity",
-	"webview" ],
+	"webview",
+	"audio",
+	"video" ],
     "policy_version": 20.04
 }
